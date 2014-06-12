@@ -1,0 +1,336 @@
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix lin:   <http://www.cngl.ie/ontologies/l18nProject#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#>.  
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl:  <http://www.w3.org/2002/07/owl#>.
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix cnt: <http://www.w3.org/2011/content#> .
+@prefix sioc: <http://rdfs.org/sioc/ns#> .
+
+# Some basic meta-data about the vocabulary
+<http://www.cngl.ie/ontologies/l18nProject#> a owl:Ontology;   
+   dc:title "Linport Semantic Model"; 
+   rdfs:label "LinPort Semantic Model" ;
+   rdfs:comment "This document specifies a semantic model based on Linports translation parameter tree";
+   owl:versionIRI <http://www.cngl.ie/ontologies/l18nProject/0.0.1#>;  
+   owl:versionInfo "0.0.1";    
+   dc:date "2014-03-25";
+   dc:creator "David Lewis";
+   dc:creator "Leroy Finn";
+   prov:derivedFrom "http://wwww.ttt.org/specs/";
+   dc:rights "The ontology license is to be confirmed but a Creative Commons Attribution License - http://creativecommons.org/licenses/by/3.0 is being considered.";
+   dc:description "Translation parameters are factors relevant to translation projects. A structured set of 21 parameters has been developed to aid in describing and organizing a translation project. Each of these parameters should be given a value, called a specification, before the production phase of a translation project begins. In some cases, a specification will be flexible, for example, 'workplace to be determined by the translation service provider'. In other cases, a specification will be rigid, for example, 'translate into French tailored to the Quebec region of Canada'. The approach described here namely, using predetermined and hierarchical parameters and corresponding project-specific values results in structured specifications.".
+
+#A. Linguistic
+#Source-content information [1-5]
+#[1]    textual characteristics	a)source language 	b)text type   c)audience	d)purpose
+#[2]    specialized language 	a)subject field 	b)terminology
+#[3]    volume
+#[4]    complexity
+#[5]    origin
+
+    lin:Linguistic a owl:Class;
+    rdfs:subClassOf prov:Entity;
+    rdfs:label "Linguistic";
+    rdfs:comment "Parameters that describe the translation source and product. This category is further split into two groups: a. Source content [1-5]: Parameters that describe the source content. b. Target content [6-13]: Parameters that describe the target content." .
+
+    lin:SourceContent a owl:Class;
+    rdfs:subClassOf lin:Linguistic;
+    rdfs:label "SourceContent";
+    rdfs:comment "Parameters that describe the source content" .
+
+    lin:TargetContent a owl:Class;
+    rdfs:subClassOf lin:Linguistic;
+    rdfs:label "TargetContent";
+    rdfs:comment "Parameters that describe the target content" .
+
+    lin:TextualCharacteristics a owl:Class;
+    rdfs:subClassOf lin:SourceContent;
+    rdfs:label "TextualCharacteristics";
+    rdfs:comment "Details about the source content" .
+
+    lin:SpecializedLanguage a owl:Class;
+    rdfs:subClassOf lin:SourceContent;
+    rdfs:label "SpecializedLanguage";
+    rdfs:comment "A description of any domain-specific language user in the source content" .	
+
+    lin:Volume a owl:Class;
+    rdfs:subClassOf lin:SourceContent;
+    rdfs:label "Volume";
+    rdfs:comment "The quantity of the source text" .
+
+	lin:Complexity a owl:Class;
+    rdfs:subClassOf lin:SourceContent;
+    rdfs:label "Complexity";
+    rdfs:comment "Information concerning the complexity of the source content" .
+
+	lin:Origin a owl:Class;
+    rdfs:subClassOf lin:SourceContent;
+    rdfs:label "Origin";
+    rdfs:comment "Any information about the provenance (source or origin) of the source content" .
+
+	#Resource Property
+	#[1]    textual characteristics	a)source language 	b)text type   c)audience	d)purpose
+	lin:sourceLanguage a owl:DatatypeProperty;
+    rdfs:label "sourceLanguage";
+    rdfs:domain lin:TextualCharacteristics;
+    rdfs:range xsd:string;
+    rdfs:comment "Language and (optional) geographic region in which the source content is written" .
+
+	lin:textType a owl:DatatypeProperty;
+    rdfs:label "textType";
+    rdfs:domain lin:TextualCharacteristics;
+    rdfs:range xsd:string;
+    rdfs:comment "The type and genre of the source content" .
+
+	lin:audience a owl:DatatypeProperty;
+    rdfs:label "audience";
+    rdfs:domain lin:TextualCharacteristics;
+    rdfs:range xsd:string;
+    rdfs:comment "Intended audience for the source content".
+
+	lin:purpose a owl:DatatypeProperty;
+    rdfs:label "purpose";
+    rdfs:domain lin:TextualCharacteristics;
+    rdfs:range xsd:string;
+    rdfs:comment "Intended purpose of the source content".
+
+	#[2]    specialized language 	a)subject field 	b)terminology
+    lin:subjectField  a owl:DatatypeProperty;
+    rdfs:label "subjectField";
+    rdfs:domain lin:SpecializedLanguage;
+    rdfs:range xsd:string;
+    rdfs:comment "Subject field(s) (domain(s)) of the source text".
+
+	lin:terminology a owl:DatatypeProperty;
+    rdfs:label "terminology";
+    rdfs:domain lin:SpecializedLanguage;
+    rdfs:range xsd:string;
+    rdfs:comment "Monolingual list of terms in the source content".
+
+#Target content information [6-13]
+#[6]    target language information 	a)target language	b)target terminology
+#[7]    audience
+#[8]    purpose
+#[9]    content correspondence
+#[10]    register 
+#[11]    file format 
+#[12]    style	a)style guide	b)style relevance
+#[13]    layout
+
+	lin:TargetLanguageInformation a owl:Class;
+    rdfs:subClassOf lin:TargetContent;
+    rdfs:label "TargetLanguageInformation";
+    rdfs:comment "Information about the language to be used in the target language" .
+
+	lin:Audience a owl:Class;
+    rdfs:subClassOf lin:TargetContent;
+    rdfs:label "Audience";
+    rdfs:comment "Intended audience for the source content" .
+
+	lin:Purpose a owl:Class;
+    rdfs:subClassOf lin:TargetContent;
+    rdfs:label "Purpose";
+    rdfs:comment "Intended purpose of the source content" .
+
+	lin:ContentCorrespondence a owl:Class;
+    rdfs:subClassOf lin:TargetContent;
+    rdfs:label "ContentCorrespondence";
+    rdfs:comment "Specifies how the content is to be translated" .
+
+	lin:Register a owl:Class;
+    rdfs:subClassOf lin:TargetContent;
+    rdfs:label "Register";
+    rdfs:comment "Description of the linguistic register to be used in the target language" .
+
+	lin:FileFormat a owl:Class;
+    rdfs:subClassOf lin:TargetContent;
+    rdfs:label "FileFormat";
+    rdfs:comment "The file format(s) in which the translated content is to be delivered" .
+
+	lin:Style a owl:Class;
+    rdfs:subClassOf lin:TargetContent;
+    rdfs:label "Style";
+    rdfs:comment "Information about the target document's style" .
+
+	lin:Layout a owl:Class;
+    rdfs:subClassOf lin:TargetContent;
+    rdfs:label  "Layout";
+	rdfs:comment "Describes the formatting requirements (if any) for the target document" .
+
+	#Resource Property
+	#[6]    target language information 	a)target language	b)target terminology
+	lin:targetLanguage a owl:DatatypeProperty;
+    rdfs:label "targetLanguage";
+    rdfs:domain lin:TargetLanguageInformation;
+    rdfs:range xsd:string;
+    rdfs:comment "The language into which the text is to be translated" .
+
+	lin:targetTerminology a owl:DatatypeProperty;
+    rdfs:label "targetTerminology";
+    rdfs:domain lin:TargetLanguageInformation;
+    rdfs:range xsd:string;
+    rdfs:comment "How target-language terminology is to be treated" .
+
+	#style	a)style guide	b)style relevance
+	lin:styleGuide a owl:DatatypeProperty;
+    rdfs:label "styleGuide";
+    rdfs:domain lin:Style;
+    rdfs:range xsd:string;
+    rdfs:comment "Style guide to be used in translation" .
+
+	lin:styleRelevance a owl:DatatypeProperty;
+    rdfs:label "styleRelevance";
+    rdfs:domain lin:Style;
+    rdfs:range xsd:string;
+    rdfs:comment "Importance of style to the project" .
+
+
+#B. Production tasks [14-15]
+#[14]    typical production tasks a)preparation	b)initial translation	c)in-process quality assurance
+#[15]    additional tasks
+
+	lin:ProductionTasks a owl:Class;
+    rdfs:subClassOf prov:Entity;
+    rdfs:label "ProductionTasks";
+    rdfs:comment "Parameters that detail the production aspects of the project" .
+
+	lin:TypicalProductionTasks a owl:Class;
+    rdfs:subClassOf lin:ProductionTasks;
+    rdfs:label "TypicalProductionTasks";
+    rdfs:comment "Description of tasks to be undertaken during the translation process." .
+
+	lin:AdditionalTasks a owl:Class;
+    rdfs:subClassOf lin:ProductionTasks;
+    rdfs:label "AdditionalTasks";
+    rdfs:comment "Any other tasks to be performed for the project not covered in the other parameters" .
+
+	#Resource Property
+	#[14]    typical production tasks a)preparation	b)initial translation	c)in-process quality assurance
+	lin:preparation a owl:ObjecttypeProperty;
+    rdfs:label "preparation";
+    rdfs:domain lin:TypicalProductionTasks;
+    rdfs:range lin:ContentProcessingActivity ;
+    rdfs:comment "Any tasks to be completed prior to translation" .
+
+    lin:initialTranslation a owl:DatatypeProperty;
+    rdfs:label "initialTranslation";
+    rdfs:domain lin:TypicalProductionTasks;
+    rdfs:range xsd:string;
+    rdfs:comment "Initial translation of the source content." .
+
+	lin:inProcessQualityAssurance a owl:ObjecttypeProperty;
+    rdfs:label "inProcessQualityAssurance";
+    rdfs:domain lin:TypicalProductionTasks;
+    rdfs:range lin:QualityReview;
+    rdfs:comment "Processes or tasks to be used to used in ensuring the quality of the translated content" .
+
+
+#C.    Environment [16-18]
+#[16]    technology
+#[17]    reference materials
+#[18]    workplace requirements
+
+    lin:Environment a owl:Class;
+    rdfs:subClassOf prov:Entity;
+    rdfs:label "Environment";
+    rdfs:comment "Parameters that describe where and with what tools the translation will take place." .
+
+	lin:Technology a owl:Class;
+    rdfs:subClassOf lin:Environment;
+    rdfs:label "Technology";
+    rdfs:comment "Any technology or software to be used in the translation process" .
+
+	lin:ReferenceMaterials a owl:Class;
+    rdfs:subClassOf lin:Environment;
+    rdfs:label "ReferenceMaterials";
+    rdfs:comment "Any reference materials to be used in the translation" .
+
+	lin:WorkplaceRequirements a owl:Class;
+    rdfs:subClassOf lin:Environment;
+    rdfs:label "WorkplaceRequirements";
+    rdfs:comment "Requirements for where work will take place and any special requirements concerning confidentiality" .
+
+#D.    Relationships [19-21]
+#[19]    permissions	a)copyright	b)recognition 	c)restrictions
+#[20]    submissions	a)qualifications	b)deliverables	c)delivery	d)deadline
+#[21]    expectations	a)compensation	b)communication
+
+    lin:Relationships a owl:Class;
+    rdfs:subClassOf prov:Entity;
+    rdfs:label "Relationships";
+    rdfs:comment "Parameters that enumerate deadlines, delivery, compensation, and other aspects of the project." .
+
+	lin:Permissions a owl:Class;
+    rdfs:subClassOf lin:Relationships;
+    rdfs:label "Permissions";
+    rdfs:comment "Describes any legal/ethical issues or restrictions" .
+
+	lin:Submissions a owl:Class;
+    rdfs:subClassOf lin:Relationships;
+    rdfs:label "Submissions";
+    rdfs:comment "Any information relevant to preparing and submitting the completed project" .
+
+	lin:Expectations a owl:Class;
+    rdfs:subClassOf lin:Relationships;
+    rdfs:label "Expectations";
+    rdfs:comment "Explains any additional requirements and clarifies any points not addressed eleswhere." .
+
+	#Resource Property
+	#[19]    permissions	a)copyright	b)recognition 	c)restrictions
+	lin:copyright a owl:DatatypeProperty;
+    rdfs:label "copyright";
+    rdfs:domain lin:Permissions;
+    rdfs:range xsd:string;
+    rdfs:comment "What party controls the copyright" .	
+
+    lin:recognition a owl:DatatypeProperty;
+    rdfs:label "recognition";
+    rdfs:domain lin:Permissions;
+    rdfs:range xsd:string;
+    rdfs:comment "Specifies what recognition is to be given to the translator in the translated work" .	
+
+    lin:restrictions a owl:DatatypeProperty;
+    rdfs:label "restrictions";
+    rdfs:domain lin:Permissions;
+    rdfs:range xsd:string;
+    rdfs:comment "Restrictions that apply to project resources (files, translation memory databases, terminology, etc.)" .	
+
+	#[20]    submissions	a)qualifications	b)deliverables	c)delivery	d)deadline
+	lin:qualifications a owl:DatatypeProperty;
+    rdfs:label "qualifications";
+    rdfs:domain lin:Submissions;
+    rdfs:range xsd:string;
+    rdfs:comment "Qualifications required of any translator or translation service provider (TSP) working on the project" .	
+
+    lin:deliverables a owl:DatatypeProperty;
+    rdfs:label "deliverables";
+    rdfs:domain lin:Submissions;
+    rdfs:range xsd:string;
+    rdfs:comment "All items that must be delivered with the final product" .	
+
+    lin:delivery a owl:DatatypeProperty;
+    rdfs:label "delivery";
+    rdfs:domain lin:Submissions;
+    rdfs:range xsd:string;
+    rdfs:comment "Any instructions for delivery of the final materials" .	
+
+	lin:deadline a owl:DatatypeProperty;
+    rdfs:label "deadline";
+    rdfs:domain lin:Submissions;
+    rdfs:range xsd:dateTime;
+    rdfs:comment "Any requirements regarding delivery deadlines" .	
+
+	#[21]    expectations	a)compensation	b)communication
+	lin:compensation a owl:DatatypeProperty;
+    rdfs:label "compensation";
+    rdfs:domain lin:Expectations;
+    rdfs:range xsd:string;
+    rdfs:comment "The compensation to be provided to the translator" .	
+
+	lin:communication a owl:DatatypeProperty;
+    rdfs:label "communication";
+    rdfs:domain lin:Expectations;
+    rdfs:range xsd:string;
+    rdfs:comment "The process for addressing any questions" .	
