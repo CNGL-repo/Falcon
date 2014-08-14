@@ -1,0 +1,612 @@
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix gic:   <http://www.cngl.ie/ontologies/gicup#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#>.  
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl:  <http://www.w3.org/2002/07/owl#>.
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix cnt: <http://www.w3.org/2011/content#> .
+@prefix str: <http://nlp2rdf.lod2.eu/schema/str#> .
+@prefix nif: <http://persistance.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> .
+@prefix sso: <http://nlp2rdf.lod2.eu/schema/sso#> .
+#  	Global Intelligent Content Semantic Model
+
+# Some basic meta-data about the vocabulary
+
+<http://www.cngl.ie/ontologies/gicup#>    
+   rdfs:label "Global Intelligent Content Semantic Model" ;
+   owl:versionInfo "0.1.02";    
+   dc:date "April 30, 2013";
+   dc:contributor "Rob Brennan" ;
+   dc:contributor "David Lewis".
+
+# Upper Model
+
+# Classes
+
+gic:Resource a owl:Class;
+	rdfs:label "global intelligent content resource" .
+
+gic:InformationResource a owl:Class;
+	rdfs:label "information resource" .
+
+gic:Service rdfs:subClassOf gic:Resource;
+	rdfs:label "service" .
+
+gic:Content rdfs:subClassOf gic:InformationResource;
+	rdfs:label "content" ;
+	rdfs:comment "a Resource created by a person with the purpose of it being consumed by other people".
+
+gic:Data rdfs:subClassOf gic:InformationResource;
+	rdfs:label "data" .
+
+# Resource Properties
+
+gic:identifiedBy a rdf:Property;
+	rdfs:label "identified by";
+	rdfs:domain gic:Resource;
+	rdfs:range xsd:anyURI .
+
+gic:refersTo a rdf:Property;
+	rdfs:label "refers to";
+	rdfs:domain gic:Resource;
+	rdfs:range gic:Resource;
+	rdfs:comment "the exact nature of the relationship is undefined it could be composition or reference by URI, or something else".
+
+# Data Properties
+
+gic:annotatedBy rdfs:subPropertyOf gic:refersTo;
+	rdfs:label "annotated by";
+	rdfs:range gic:InformationResource.
+
+# Connecting W3C Content model with Global Intelligent Content Model
+
+gic:Content rdfs:subClassOf cnt:Content .
+
+# Connecting Upper Model with Prov Model
+
+# Classes
+
+gic:ContentProcessingActivity rdfs:subclassOf prov:Activity;    
+    rdfs:label "content processing activity".
+
+gic:ComponentGenerationActivity rdfs:subclassOf prov:Activity;    
+    rdfs:label "component generation activity".
+
+gic:ContentProcessingComponent rdfs:subclassOf prov:Agent;
+    rdfs:subclassOf prov:Entity;
+    rdfs:label "content processing component".
+
+gic:ComponentFactory rdfs:subclassOf prov:Agent;
+    rdfs:label "component factory".
+
+# Properties
+
+gic:usedService rdfs:subPropertyOf prov:used;
+    rdfs:domain gic:ContentProcessingActivity;
+    rdfs:label "used service".
+
+gic:offerBy rdfs:subPropertyOf prov:wasAttributedTo;
+    rdfs:range gic:ContentProcessingComponent;
+    rdfs:label "offered by".
+
+# Text Analytics Model
+
+# Classes
+
+str:String rdfs:subClassOf gic:Content.
+
+gic:TextAnalysis a rdfs:Class;
+    rdfs:label "text analysis".
+
+# Multilingual Content Processing Model
+
+# Classes
+
+gic:TranslationRevision rdfs:subClassOf gic:Content;
+    rdfs:label "translation revision" ;
+    rdfs:comment "the revision of a string that was originally a Translation" .
+
+gic:Translation rdfs:subClassOf gic:Content;
+    rdfs:label "translation";
+    rdfs:comment "a string that was produced by translating another string from its source language into a specified target language".
+
+gic:Term rdfs:subClassOf gic:Content;
+   	 rdfs:label "term";
+    rdfs:comment "a string that is subject to terminology management with the intention of supporting consistent source content and the consistent translation  the source term".
+
+gic:AnalysedText rdfs:subClassOf gic:Content;
+    rdfs:label "analysed text" ;
+    rdfs:comment "a string identified by some text analysis process as possessing some common semantic and/or lexical characteristics".
+
+gic:Segment rdfs:subClassOf gic:Content;
+    rdfs:label "segment" ;
+    rdfs:comment "a string resulting from subdividing source content to a granularity designed to ease  translation. Typically this is a sentence, but may also be text from a heading  cell or a table".
+
+gic:SourceUnit rdfs:subClassOf gic:Content;
+    rdfs:label "source unit";
+    rdfs:comment "a string extracted from a source document for the purposes of translating the text it contains" .
+
+# Properties
+
+gic:wasTranslatedFrom rdfs:subPropertyOf prov:wasDerivedFrom;
+   	 rdfs:label "was translated from" ;
+    rdfs:domain gic:Translation;
+    rdfs:range gic:Content;
+    rdfs:comment "links a gic:Translation (as range) to the corresponding source text" .
+
+# Note extensive use of prov:wasDerivedFrom to specify transformations.
+
+# Multimodal Interaction Processing Model
+
+# Classes
+
+gic:Dialogue rdfs:subClassOf prov:Entity;
+	rdfs:label "dialogue".
+
+gic:PersonMachineDialogue rdfs:subClassOf gic:Dialogue;
+	rdfs:label "person-machine dialogue".
+
+gic:PersonPersonDialogue rdfs:subClassOf gic:Dialogue;
+	rdfs:label "person-person dialogue".
+
+gic:InteractionManagement rdfs:subClassOf prov:Activity;
+	rdfs:label "interaction management".
+
+gic:DialogueScript rdfs:subClassOf gic:Content;
+	rdfs:label "dialogue script".
+
+gic:OutSignal rdfs:subClassOf gic:Content;
+	rdfs:label "out signal".
+
+gic:Interpretation rdfs:subClassOf prov:Entity;
+	rdfs:label "interpretation".
+
+gic:Affect rdfs:subClassOf prov:Entity;
+	rdfs:label "affect".
+
+gic:InSignal rdfs:subClassOf prov:Entity;
+	rdfs:label "in signal".
+
+gic:Person rdfs:subClassOf prov:Agent;
+	rdfs:label "person".
+
+# Properties
+
+gic:detected a rdf:Property;
+   	 rdfs:label "detected" ;
+    rdfs:range gic:Affect;
+    rdfs:domain gic:Interpretation .
+
+gic:wasFeltBy a rdf:Property;
+   	 rdfs:label "was felt by" ;
+    rdfs:range gic:Person;
+    rdfs:domain gic:Affect .
+
+gic:conveyed a rdf:Property;
+   	 rdfs:label "conveyed" ;
+    rdfs:range gic:Affect;
+    rdfs:domain gic:InSignal .
+
+# Personalised Content Discovery and Adaptation Processing Model
+
+# Classes
+
+gic:PersonalisedInteraction rdfs:subClassOf prov:Entity;
+	rdfs:label "personalised interaction".
+
+gic:PersonalisedSearchSession rdfs:subClassOf gic:PersonalisedInteraction;
+	rdfs:label "personalised search session".
+
+gic:Slice rdfs:subClassOf gic:Content;
+	rdfs:label "slice".
+
+gic:UserModel rdfs:subClassOf prov:Entity;
+	rdfs:label "user model".
+
+gic:Query rdfs:subClassOf prov:Entity;
+	rdfs:label "query".
+
+gic:ContentSlicing rdfs:subClassOf prov:Entity;
+	rdfs:label "content slicing".
+
+gic:UserProfiling rdfs:subClassOf prov:Entity;
+	rdfs:label "user profiling".
+
+gic:SocialUserProfiling rdfs:subClassOf gic:UserProfiling;
+	rdfs:label "social user profiling".
+
+# gic:Person defined above
+
+gic:Personalisation rdfs:subClassOf prov:Activity;
+	rdfs:label "personalisation".
+
+gic:PersonalisedSearch rdfs:subClassOf gic:Personalisation;
+	rdfs:label "personalised search".
+
+gic:PersonalisedCompositeIR rdfs:subClassOf gic:PersonalisedSearch;
+	rdfs:label "personalised composite IR".
+
+# Properties
+
+gic:profiled a rdf:Property;
+    rdfs:label "profiled";
+    rdfs:domain gic:UserModel;
+    rdfs:range gic:Person.
+	
+	
+# My Additions
+
+# CONTENT CONSUMED AND GENERATED PROPERTIES
+gic:contentConsumed rdfs:subPropertyOf  prov:Used ;
+	rdfs:domain  gic:contentProcessingActivity ;
+	rdfs:range  gic:InformationResource .
+
+
+gic:contentGeneratedBy  rdfs:subPropertyOf  prov:wasDerivedBy ;
+	rdfs:domain  gic:InformationResource ;
+	rdfs:range  gic:contentProcessingActivity .
+
+
+# 1 - TEXT ANALYSIS
+gic:TextAnalysis  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentConsumed ;
+		owl:allValuesFrom  [
+			owl:unionOf ( 
+						  gic:Content
+						  nif:String 
+						  nif:Structure 
+						  nif:Word 
+						  nif:Phrase 
+						  nif:Sentence 
+						)
+		]
+	] ;
+		
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentGenerated ;
+		owl:allValuesFrom [
+			owl:unionOf ( 
+			              gic:Content
+						  nif:String
+						  nif:Phrase
+						  nif:Word
+						  sso:Phrase
+						  sso:Word
+						)
+		]
+	] .
+
+
+# 2 - EXTRACTION
+gic:Extraction  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentConsumed ;
+		owl:allValuesFrom [  
+			owl:unionOf ( 
+						  gic:Content
+						)
+		]
+	] ;
+		
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentGenerated ;
+		owl:allValuesFrom [  
+			owl:unionOf (
+						  gic:Content
+						  gic:SourceUnit
+						)
+		]
+	] .
+		
+		
+# 3 - SEGMENTATION
+gic:Segmentation  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentConsumed ;
+		owl:allValuesFrom [  
+			owl:unionOf ( 
+						  gic:Content
+						  gic:SourceUnit
+						)
+		]
+	] ;
+		
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentGenerated ;
+		owl:allValuesFrom [  
+			owl:unionOf ( 
+						  gic:Content
+						  gic:Segment
+						)
+		]
+	] .
+
+		
+# 4 - TERMINOLOGY IDENTIFICATION
+gic:TerminologyIdentification  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentConsumed ;
+		owl:allValuesFrom  [
+			owl:unionOf ( 
+						  gic:Content
+						  nif:String
+						  nif:Structure
+						  nif:Word
+						  nif:Phrase
+						  nif:Sentence
+						  sso:Phrase
+						  sso:Word
+						)
+		]
+	] ;
+		
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentGenerated ;
+		owl:allValuesFrom [  
+			owl:unionOf ( 
+						  gic:Content
+						  gic:Term
+						)
+		]
+	] .
+		
+		
+# 5 - TRANSLATE	
+gic:Translate  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentConsumed ;
+		owl:allValuesFrom  [
+			owl:unionOf ( 
+						  gic:Content
+						  gic:SourceUnit
+						  gic:Segment
+						  gic:Term
+						  nif:String
+						  nif:Structure
+						  nif:Word
+						  nif:Phrase
+						  sso:Word
+						  sso:Phrase
+						)
+		]
+	] ;
+		
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentGenerated ;
+		owl:allValuesFrom [  
+			owl:unionOf ( 
+						  gic:Content
+						  gic:Translation
+						)
+		]
+	] .
+		
+		
+# 6 - REVISE TRANSLATION
+gic:ReviseTranslation  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentConsumed ;
+		owl:allValuesFrom  [
+			owl:unionOf ( 
+						  gic:Content
+						  gic:SourceUnit
+						  gic:Segment
+						  gic:Term
+						  nif:String
+						  nif:Structure
+						  nif:Word
+						  nif:Phrase
+						  sso:Word
+						  sso:Phrase
+						  gic:Translation
+						  gic:TranslationRevision
+						)
+		]
+	] ;
+		
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentGenerated ;
+		owl:allValuesFrom [  
+			owl:unionOf ( 
+						  gic:Content
+						  gic:TranslationRevision
+						)
+		]
+	] .
+		
+		
+# 7 - QUALITY REVIEW	
+gic:QualityReview  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentConsumed ;
+		owl:allValuesFrom  [
+			owl:unionOf ( 
+						  gic:Content
+						  gic:SourceUnit
+						  gic:Segment
+						  gic:Term
+						  nif:String
+						  nif:Structure
+						  nif:Word
+						  nif:Phrase
+						  sso:Word
+						  sso:Phrase
+						  gic:Translation
+						  gic:TranslationRevision
+						)
+		]
+	] ;
+		
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentGenerated ;
+		owl:allValuesFrom [  
+			owl:unionOf (
+						  gic:Content
+						  gic:QualityAssessment
+						)
+		]
+	] .
+		
+		
+# 8 - INTERACTION MANAGEMENT	
+gic:InteractionManagement  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentConsumed ;
+		owl:allValuesFrom  [
+			owl:unionOf (
+						  gic:Content
+						  gic:DialogueScript
+						  gic:Interpretation
+						)
+		]
+	] ;
+		
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentGenerated ;
+		owl:allValuesFrom [  
+			owl:unionOf (
+						  gic:Content
+						  gic:OutSignal
+						)
+		]
+	] .
+
+		
+# 9 - INPUT INTERPRETATION	
+gic:InputInterpretation  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentConsumed ;
+		owl:allValuesFrom [  
+			owl:unionOf (
+						  gic:Content
+						  gic:InSignal
+						)
+		]
+	] ;
+		
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentGenerated ;
+		owl:allValuesFrom [  
+			owl:unionOf ( 
+						  gic:Content
+						  gic:Interpretation
+						)
+		]
+	] .
+		
+
+# 10 - USER PROFILING			
+gic:UserProfiling  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentGenerated ;
+		owl:allValuesFrom [  
+			owl:unionOf (
+						  gic:Content
+						  gic:UserModel
+						)
+		]
+	] .
+		
+
+# 11 - CONTENT SLICING
+gic:ContentSlicing  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentConsumed ;
+		owl:allValuesFrom [  
+			owl:unionOf ( 
+						  gic:Content
+						)
+		]
+	] ;
+	
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentGenerated ;
+		owl:allValuesFrom [  
+			owl:unionOf (
+						  gic:Content
+						  gic:Slice
+						)
+		]
+	] .	
+		
+
+# 12 - PERSONALISATION	
+gic:Personalisation  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentConsumed ;
+		owl:allValuesFrom  [
+			owl:unionOf (
+						  gic:Content
+						  gic:UserModel
+						)
+		]
+	] .
+		
+	
+# 13 - PERSONALISED SEARCH	
+gic:PersonalisedSearch  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentConsumed ;
+		owl:allValuesFrom [  
+			owl:unionOf (
+						  gic:Content
+						  gic:Query
+						)
+		]
+	] .
+
+	
+# 14 - PERSONALISED COMPOSITION	
+gic:PersonalisedComposition  a  owl:Class ;
+	rdfs:subClassOf  gic:contentProcessingActivity ;
+	owl:equivilentClass [
+		rdf:type  owl:Restriction ;
+		owl:onProperty  gic:contentConsumed ;
+		owl:allValuesFrom  [
+			owl:unionOf ( 
+						  gic:Content
+						  gic:Narrative
+						  gic:Slice
+						)
+		]
+	] .	
+
+#End. Validated at http://www.rdfabout.com/demo/validator/validate.xpd

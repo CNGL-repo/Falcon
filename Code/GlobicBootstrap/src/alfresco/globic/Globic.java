@@ -4,15 +4,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
 import twitter4j.internal.org.json.JSONException;
 import twitter4j.internal.org.json.JSONObject;
+import xliff2n3.ContentLogging;
+
 
 /**
  *
@@ -172,43 +179,75 @@ public class Globic {
      *
      * @return a response whether post was successful or not
      */
-    public static String postGlobicContent(String componentName, String user, String password, String activity, String contentDir, String contentType,String content) {
+    public static String postGlobicContent(String componentName, String user, String password, String activity, String contentDir, String contentType,String contentJobType,String filename,String partitionName) {
         System.getProperties().put("proxySet", "true");
         System.getProperties().put("proxyHost", "www-proxy.cs.tcd.ie");
         System.getProperties().put("proxyPort", "8080");
         String output = "";
         String line = "";
-        try {
-            // Construct data
-            String query = URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(password, "UTF-8");
-            query += "&" + URLEncoder.encode("activity", "UTF-8") + "=" + URLEncoder.encode(activity, "UTF-8");
+      
+        String url="http://phaedrus.scss.tcd.ie/gls/globicLog/service/"+componentName+"/?";
+        
+         try {
+
+             
+            String query = URLEncoder.encode("activity", "UTF-8") + "=" + URLEncoder.encode(activity, "UTF-8");
             query += "&" + URLEncoder.encode("user", "UTF-8") + "=" + URLEncoder.encode(user, "UTF-8");
-            if (!content.equals("") && !content.equals(null) && content.equalsIgnoreCase("consumed")) {
-                query += "&" + URLEncoder.encode("contentConsumed1", "UTF-8") + "=" + URLEncoder.encode(contentDir, "UTF-8");
+            query += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(password, "UTF-8");
+            query += "&" + URLEncoder.encode("partitionName", "UTF-8") + "=" + URLEncoder.encode(partitionName, "UTF-8");
+            
+             if (!contentJobType.equals("") && !contentJobType.equals(null) && contentJobType.equalsIgnoreCase("consumed")) {
+                query += "&" + URLEncoder.encode("contentConsumed1", "UTF-8") + "=" +"%3C"+contentDir+"%3E";
                 query += "&" + URLEncoder.encode("contentConsumed1Type", "UTF-8") + "=" + URLEncoder.encode(contentType, "UTF-8");
             }else
-                if (!content.equals("") && !content.equals(null) && content.equalsIgnoreCase("generated")) {
-                     query += "&" + URLEncoder.encode("contentGenerated1", "UTF-8") + "=" + URLEncoder.encode(contentDir, "UTF-8");
+                if (!contentJobType.equals("") && !contentJobType.equals(null) && contentJobType.equalsIgnoreCase("generated")) {
+                     query += "&" + URLEncoder.encode("contentGenerated1", "UTF-8") + "=" + "%3C"+contentDir+"%3E";
                      query += "&" + URLEncoder.encode("contentGenerated1Type", "UTF-8") + "=" + URLEncoder.encode(contentType, "UTF-8");
                 }
-            // Send data
-           // System.out.println(query+content+contentType);
-            URL url = new URL("http://kdeg-vm-24.scss.tcd.ie/globicLog/service/" + componentName + "/");
-            URLConnection conn = url.openConnection();
-            conn.setDoOutput(true);
-            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-            wr.write(query);
-            wr.flush();
+            
+            //String query="";
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost postRequest = new HttpPost(url+query);
 
-            // Get the response
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            while ((line = rd.readLine()) != null) {
-                output = output + line;
+            HttpResponse response = httpClient.execute(postRequest);
+
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+            } else {
+                System.out.println("SUCCESS");
             }
-            wr.close();
-            rd.close();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    (response.getEntity().getContent())));
+
+            System.out.println("Output from Server .... \n");
+            while ((line = br.readLine()) != null) {
+                 output = output + line;
+                System.out.println("output==="+output);
+            }
+
+            httpClient.getConnectionManager().shutdown();
+
+        } catch (MalformedURLException e) {
+
+            e.printStackTrace();
         } catch (IOException e) {
+
+            e.printStackTrace();
+
         }
+
+        if(output==""){
+            System.out.println("SUCESS");
+            output="sucess";
+        }
+        
+         //parse using xslt
+        if(output.equalsIgnoreCase("sucess")){
+        output=output+ContentLogging.logging(filename, componentName);
+        } 
+        
         return output;
     }
 
@@ -248,7 +287,7 @@ public class Globic {
      * @throws JSONException
      */
     public static JSONObject retrieveGlobicData(String componentName, String password, String retrieveData) throws IOException, JSONException {
-        String url = "http://kdeg-vm-24.scss.tcd.ie/globicLog/service/" + componentName + "/?password=" + password + "&retrieveData=" + retrieveData;
+        String url = "http://phaedrus.scss.tcd.ie/gls/globicLog/service/" + componentName + "/?password=" + password + "&retrieveData=" + retrieveData;
         InputStream is = new URL(url).openStream();
         try {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
@@ -285,24 +324,25 @@ public class Globic {
      * @throws JSONException
      */
     public static void main(String args[]) throws MalformedURLException, IOException, JSONException {
+        //http://phaedrus.scss.tcd.ie/gls/globicLog/service/leanback_learning/?password=cngl1&partitionName=leanback_learning&user=Joe_Bloggs &contentConsumed1=<http://www.example.com/filestore/document_1>&contentConsumed1Type=nif:String&activity=my_translate_92
         String user = "finnle";
-        String password = "123456";
-        String componentName = "MockComponent_1";
-        String activity = "my_translate";
-        String contentConsumed = "<http://kdeg-vm-13.scss.tcd.ie:8080/alfresco/d/d/workspace/SpacesStore/c8bd7f0d-3e7a-4bcd-95ca-4609a7658d37/f103941.csv>";
+        String password = "cngl1";
+        String componentName = "leanback_learning";
+        String activity = "translate_1234";
+        String contentConsumed = "http://134.226.48.38/lbl/content/meta_0906_DublinCity.xml";
         String contentConsumedType = "nif:String";
-        String partitionName = "";
+        String partitionName = "Test";
         String content="consumed";
+       // String partitionName="leanback_learning";
 
         //register component
-        System.out.println(Globic.registerComponent(componentName, password, partitionName));
+        //System.out.println(Globic.registerComponent(componentName, password, partitionName));
 
         //post globic content
-        System.out.println(Globic.postGlobicContent(componentName, user, password, activity, contentConsumed, contentConsumedType,content));
+        System.out.println(Globic.postGlobicContent(componentName, user, password, activity, contentConsumed, contentConsumedType,content,"",partitionName));
 
         //retrieve data
-        JSONObject json = retrieveGlobicData(componentName, password, "gic:my_translate");
-        System.out.println(json.toString());
-
+        //JSONObject json = retrieveGlobicData(componentName, password, "gic:translateActivity101");
+        //System.out.println(json.toString());
     }
 }

@@ -1,0 +1,60 @@
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file datatype="plaintext" original="content.txt" source-language="en" target-language="es"
+        category="General">
+        <header>
+            <phase-group>
+                <phase phase-name="Project Kick-off" process-name="Start"
+                    company-name="LRC" tool-id="PMUI" date="2010-11-10T13:59:18Z"
+                    job-id="b043a10ead"/>
+                <phase phase-name="Segmentation" company-name="SomeCompany"
+                    process-name="SegProcess" contact-name="FakePerson"
+                    contact-email="fake@tcd.ie"
+                    date="2010-11-10T14:59:18Z"/>
+                <phase phase-name="MT-Leverage" process-name="Translation-MT" tool-id="MT"
+                    date="2010-11-10T15:59:18Z"/>
+            </phase-group>
+            <reference>
+                <internal-file form="text">This article introduces the basic elements of the new user interface. It also provides a list of Office Access 2003 commands and shows you where those commands reside in. This article is designed as a quick reference tool only, and is not intended for training or learning purposes.</internal-file>
+            </reference>
+            <tool tool-name="Project Management User Interface - locConnect" tool-id="PMUI" tool-version="1"/>
+            <reference>
+                <external-file href="http://127.0.0.1/get_resource.php?id=b043a10ead"/>
+            </reference>
+            <tool tool-id="MT" tool-name="MT-Broker/Mapper"/>
+        </header>
+        <body>
+            <group>
+                <count-group name="word_count">
+                    <count count-type="total" unit="word">369</count>
+                </count-group>
+                <count-group name="segment_count">
+                    <count count-type="total" unit="segment">27</count>
+                </count-group>
+                <count-group name="character_count">
+                    <count count-type="total" unit="character">2214</count>
+                </count-group>
+            </group>
+            <trans-unit id="#1">
+                <source>This article introduces the basic elements of the new user interface.</source>
+                <target/>
+                <alt-trans tool-id="MT" origin="google" phase-name="MT-Leverage"><target>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</target></alt-trans>
+                <alt-trans tool-id="MT" origin="microsoft" phase-name="MT-Leverage"><target>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</target></alt-trans>
+                <alt-trans tool-id="MT" origin="babelfish" phase-name="MT-Leverage"><target>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</target></alt-trans>
+            </trans-unit>
+            <trans-unit id="#2">
+                <source>It also provides a list of Office Access 2003 commands and shows you where those commands reside in.</source>
+                <target>Dummy</target>
+                <alt-trans tool-id="MT" origin="google" phase-name="MT-Leverage"><target>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</target></alt-trans>
+                <alt-trans tool-id="MT" origin="microsoft" phase-name="MT-Leverage"><target>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</target></alt-trans>
+                <alt-trans tool-id="MT" origin="babelfish" phase-name="MT-Leverage"><target>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</target></alt-trans>
+            </trans-unit>
+            <trans-unit id="#3">
+                <source>This article is designed as a quick reference tool only, and is not intended for training or learning purposes.</source>
+                <target/>
+                <alt-trans tool-id="MT" origin="google" phase-name="MT-Leverage"><target>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</target></alt-trans>
+                <alt-trans tool-id="MT" origin="microsoft" phase-name="MT-Leverage"><target>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</target></alt-trans>
+                <alt-trans tool-id="MT" origin="babelfish" phase-name="MT-Leverage"><target>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</target></alt-trans>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

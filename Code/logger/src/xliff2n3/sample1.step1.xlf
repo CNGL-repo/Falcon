@@ -1,0 +1,20 @@
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file datatype="plaintext" original="content.txt" source-language="en" target-language="es"
+        category="General">
+        <header>
+            <phase-group>
+                <phase phase-name="Project Kick-off" process-name="Start"
+                    company-name="LRC" tool-id="PMUI" date="2010-11-10T13:59:18Z"
+                    job-id="b043a10ead"/>
+            </phase-group>
+            <reference>
+                <internal-file form="text">This article introduces the basic elements of the new user interface. It also provides a list of Office Access 2003 commands and shows you where those commands reside in. This article is designed as a quick reference tool only, and is not intended for training or learning purposes.</internal-file>
+            </reference>
+            <tool tool-name="Project Management User Interface - locConnect" tool-id="PMUI" tool-version="1"/>
+            <reference>
+                <external-file href="http://127.0.0.1/get_resource.php?id=b043a10ead"/>
+            </reference>
+            <tool tool-id="MT" tool-name="MT-Broker/Mapper"/>
+        </header>
+    </file>
+</xliff>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Globic Log Service - User Guide</title>
+ </head>
+ <body>
+
+ <h1 style="color:#1E90FF">Globic Log Service - User Guide</h1>
+
+ <p>The aim of this guide is to provide users of the Globic Log Service with all the necessary information 
+    in order to utilise the service.<br />
+	Requests made to the The Globic Log Service are through a URI and http method. An effective means to 
+	make these requests is through the use of a http transfer library (such as Curl).<br /><br />
+	The three main functional points of the Service are:<br/>
+	<a href="#register_heading">Registration</a><br />
+	<a href="#prov_gen_heading">Provenance Generation</a><br />
+	<a href="#data_retrieval_heading">Data Retrieval</a>
+	</p>
+ <hr />
+ <h2 style="color:#FF0000"><a id="register_heading">1- Registration</a></h2>
+  
+ <p>This section describes how to register a component with the Globic Log Service. A component must 
+    register with the service before it can avail of the provenance generation or data retrieval services.<br/>
+	Registration with the system is carried out via a URI request and uses the <b>POST</b> method. 
+	The structure of the request is important for the service to recognise what needs to be carried out. 
+	The structure is as follows:
+	<ul>
+	<li><b>POST http://www.example.com/globicLog/register/?componentName=(...)&password=(...)&graphName=(...)</b></li>
+	</ul>
+	Three tokens are used in the request to specify the information to submit.
+	<ul>
+	<li><b>?componentName </b> : Here you specify what name you want to call your component. Component name 
+	    must be unique. It is not possible to have two or more components with the same name registered
+		with the service.</li>
+		<br />
+	<li><b>&password </b> : Here you specify your password which will be used to verify your component 
+	    when making requests to the system. It is recommended not use a password you have for any other 
+		accounts.</li>
+		<br />
+	<li><b>&partitionName </b> (optional) : Here you can specify a partition in the triple-store in which 
+	    your component will store data to and retrieve data from. This is an optional token in the request.
+		If it is not specified, you will record data to and retrieve data from a default partition in the
+		triple-store. This option can be useful if you want your own 'sandbox' so provenance records from 
+		other components will not be appear in your partition. It is also possible for multiple 
+		components to specify the partition name if they wish to share the same provenance data.</li>
+	</ul>
+	Each of the three token data fields are restricted to using numbers (0-9), letters (A-Z a-z), 
+	the dash symbol ( - ) and the underscore symbol ( _ ).If any part of the request is wrong, the 
+	service will return an error message indicating where the error possibly lies. A message confirming 
+	registration will be returned if there are no error in the request.<br /><br />
+	As an example of the registration process, a component by the name of 'MockComponent_1' will register 
+	with the service:
+	<ul>
+	<li>POST http://www.example.com/globicLog/register/?componentName=MockComponent_1&password=123456&partitionName=partition1</li>
+	</ul>
+	</p>
+	<hr />
+ 
+ <h2 style="color:#FF0000"><a id="prov_gen_heading">2 - Provenance Generation</a></h2>
+ <p>This section describes how to submit data to the service in order for it to generate provenance 
+    data in RDF making special use of the <a href="http://www.cngl.ie/ontologies/gic#">
+	Globic semantic model</a> and the <a href="http://www.w3.org/ns/prov#">PROV-O semantic model</a>. 
+	A component must be registered with the service before it can submit data. Submitting data to the 
+	service is done in a similar manner to registration, through a URI request and use of the <b>POST</b> 
+	method. Like the registration request, the structure of the provenance generation request is 
+	important for the service to recognise what needs to be carried out. The structure is as follows:
+	<ul>
+	<li><b>POST http://www.example.com/globicLog/service/(your_component_name)/?password=(...)&activity=(...)&user=(...)&contentConsumed1=(...)&contentConsumed1Type=(...)&contentGenerated1=(...)&contentGenerated1Type=(...)</b></li>
+	</ul>
+	There are a number of tokens associated with the provenance generation request, some are mandatory 
+	and some optional. Notice how a components name appears in the request, it is not specified as a token.
+	<ul>
+	<li><b>?password</b> : Here you enter your password.</li>
+	<br />
+	<li><b>&activity</b> : Here you enter the activity that is being carried out by your component.
+	    An activity is limited to the list of content processing activities specified in the Globic 
+		semantic model. In order for the service to be able to recognise the activity, the name you give 
+		to the activity being carried out must contain the <u>actual name of the activity</u> as specified in the 
+		Globic model.<br /> 
+		For example, two content processing activities within the Globic model are <i>TextAnalysis</i> 
+		and <i>Translate</i>. Some Sample activity names that would work with the service would be : 
+		textanalysis_50, 5_My_TextAnalysis, translateActivity101 or my_translate_92. These work as the 
+		<u>actual activity name</u> appears within the name given. Some Sample activity names that would 
+		not work with the service would be: 5_My_Text_Analysis, AnalysisText_12 or trans_7.<br />
+		A list of the content processing activities from the Globic semantic model and the types of 
+		content that an activity can consume or generate can be found <a href="http://localhost/globicLog/activity_content_list.html">here</a>.</li>
+		<br />
+	<li><b>&user</b> (Optional) : Here you can specify if a user was involved in an activity along with 
+	    a component. This is an optional token in the request as a user does not always have to be 
+		involved in an activity. The user can be the name of a person or a worker ID number etc. 
+		If specifying the user as the name of a person with a first and last name, do not use a space 
+		between the names, instead use humpback notation or use an underscore, for example: JoeBloggs or 
+		Joe_Bloggs.</li>
+	<br />
+	<li><b>&contentConsumed#</b> (Optional *) : Here it is possible to specify up to 10 pieces of content 
+        that were consumed or used by an activity. This is an optional token in the request as not all 
+		activities consume content. Pieces of content consumed are specified by appending a number (1-10) 
+		at the end of the token, where the hash symbol is located. The Globic Log Service deals with 
+		content from a file oriented perspective, so what you specify is a URI of the files location.<br />
+		An example to specify two pieces of consumed content, <i>document_1</i> and 
+		<i>document_2</i> with a URI location of <i>http://www.example.com/filestore/</i>, 
+		would look as follows: &contentConsumed1=&lthttp://www.example.com/filestore/document_1&gt&contentConsumed2=&lthttp://www.example.com/filestore/docuemnt_2&gt .<br />
+		</li>
+	<br />
+	<li><b>&contentConsumed#Type</b> (Optional) : Here it is possible to specify the <i>type</i> of any of 
+	    the consumed content. The <i>type</i> describes what a piece of content is i.e. 
+		a string, a word, a sentence, a structure, a translation, a revise translation, 
+		a piece of analyised text etc. The Globic semantic model contains the types of content that can be
+		consumed for each activity so when specifying a type for a piece of consumed content, 
+		it must match that in the Globic model.This is an optional token in the request; it is used to 
+		make the generated provenance data more accurate. If it is not set then any consumed content 
+		is set to a default type. In order to specify a type for a piece of consumed content, the number 
+		associated with a piece of consumed content is placed in the token, where the hash symbol is 
+		located.<br />
+		For example, if you have already specified some consumed content: &contentConsumed1=<http://www.example.com/filestore/document_1> .
+        In order to declare that document_1 is of type <i>nif:String</i>, you would add the following to 
+		the request: &contentConsumed1Type=nif:String .<br />
+        The content types must use the appropriate namespaces. A list of the content processing activities
+		from the Globic semantic model and the types of content that an activity can consume or generate
+        can be found <a href="http://localhost/globicLog/activity_content_list.html">here<a/>.</li>
+	<br />
+	<li><b>&contentGenerated#</b> (Optional *) : Here it is possible to specify up to 10 pieces of content 
+        that were generated by an activity. This is an optional token in the request as not all 
+		activities generate content. Pieces of content are specified by appending a number (1-10) at the 
+		end of the token, where the hash symbol is located. The Globic Log Service deals with content 
+		from a file oriented perspective, so what you specify is a URI of the files location.<br />
+		An example to specify two pieces of content that were generated, <i>document_3</i> and 
+		<i>document_4</i> with a URI location of <i>http://www.example.com/filestore/</i>, 
+		would look as follows: &contentGenerated1=&lthttp://www.example.com/filestore/document_3&gt&contentGenerated2=&lthttp://www.example.com/filestore/docuemnt_4&gt .</li>
+	<br />
+	<li><b>&contentGenerated#Type</b> (Optional) : Here it is possible to specify the <i>type</i> of any of 
+	    the generated content similar to how you can do it for any content consumed. The Globic semantic 
+		model contains the types of content that can be generated for each activity so when specifying 
+		a type for a piece of generated content, it must match that in the Globic model. This is an 
+		optional token in the request; it is used to make the generated provenance data more accurate. 
+		If it is not set then any consumed content is set to a default type. In order to specify a type 
+		for a piece of generated content, the number associated with a piece of generated content is 
+		placed in the token, where the hash symbol is located.<br />
+		For example, if you have already specified some generated content: &contentGenereated1=&lthttp://www.example.com/filestore/document_3&gt .
+        In order to declare that document_3 is of type <i>gic:Translation</i>, you would add the following 
+		to the request: &contentGenerated1Type=gic:Translation .<br />
+		The content types must use the appropriate namespaces. A list of the content processing activities
+		from the Globic semantic model and the types of content that an activity can consume or generate
+        can be found <a href="http://localhost/globicLog/activity_content_list.html">here<a/>.</li>
+	</ul>
+	(<b>Optional *</b> = While the '&contentConsumed#' and '&contentGenerated#' tokens are optional 
+	 themselves, at least one must appear in a request as an activity must consume or generate at least 
+	 one piece of content.)<br/><br/>
+	 
+	 An example of generated provenance data can be found <a href="http://localhost/globicLog/example_provenance.html">here</a>.
+	</p>
+	
+ <hr />
+ <h2 style="color:#FF0000"><a id="data_retrieval_heading">3 - Provenance Data Retrieval</a></h2>
+ <p>This section describes how to retrieve provenance data from the service about a piece of <i>content</i>, 
+    a <i>component</i>, an <i>activity</i> or a <i>user</i>. The data is returned in JSON format.
+	A component must be registered with the service before it can retrieve data. Retrieving data from 
+	the service is carried out via a URI request and uses the <b>GET</b> method. The structure of the data 
+	retrieval request is important for the service to recognise what needs to be carried out. 
+	The structure is as follows:</p>
+    <ul>
+	<li><b>GET http://www.example.com/globicLog/service/(your_component_name)/?password=(...)&retrieveData=(...)</b></li>
+	</ul>
+	There are two tokens associated with the data retrieval request, both are mandatory. 
+	Notice how a components name appears in the the request, it is not specified as a token.
+	<ul>
+	<li><b>?password</b> : Here you enter your password.</li>
+	<br />
+	<li><b>&requestData</b> : Here it is possible to specify the name of some data for which you wish to 
+	retrieve provenance records about. It is possible to retrieve provenance records about a piece of 
+	<i>content</i>, a <i>component</i>, an <i>activity</i> or a <i>user</i>. For example:<br />
+	To retrieve provenance records about a piece content, you would add the following to the request:
+	&retrieveData=&lthttp://www.example.com/filestore/document_1&gt.<br/>
+    To retrieve provenance records about a component, an activity or a user, you would add the following
+    to the request: <br/>
+	<b>Component:</b> &retrieveData=gic:MockComponent_1 <br/>
+	<b>Activity:</b> &retrieveData=gic:translateActivity101 <br/>
+	<b>User:</b> &retrieveData=gic:Joe_Bloggs<br/><br/>
+	Note the difference between retrieving provenance records about a piece of content and a component, 
+	activity or a user. Content is always declared as a URI and a component, activity or a user always use
+	the <b>gic:</b> namespace.<br/>
+	</li>
+	</ul>
+	Examples of retrieved provenance data can be found <a href="http://localhost/globicLog/example_provenance.html">here</a>.
+	<br />
+	
+  <div id="footer" style="clear:both;text-align:center;">Alan Meehan - 12/09/2013</div>	
+  	
+ </body>
+</html>

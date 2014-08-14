@@ -3,6 +3,14 @@ package alfresco.repo;
 import alfresco.globic.Globic;
 import java.io.*;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
@@ -18,82 +26,77 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisContentAlreadyExists
 import org.apache.chemistry.opencmis.commons.exceptions.CmisInvalidArgumentException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
+import xliff2n3.Constants;
+//import xliff2n3.Main;
 
 /**
- * 
- * This class is responsible for connecting and interacting with the Alfresco CMS
- * 
+ *
+ * This class is responsible for connecting and interacting with the Alfresco
+ * CMS
+ *
  * @author Leroy
  */
 public class RepositoryHandler {
 
     /**
-     * 
+     *
      * Repository user name
-     * 
+     *
      */
     private String repositoryUsername;
-    
     /**
-     * 
+     *
      * Repository password
-     * 
+     *
      */
     private String repositoryPasword;
-    
     /**
-     * 
+     *
      * Repository type
-     * 
+     *
      */
     public int repositoryType;
-    
     /**
      *
      * Repository URL location
-     * 
+     *
      */
     public String repositoryURL;
-    
     /**
-     * 
+     *
      * Repository session variable
-     * 
+     *
      */
     public Session session;
-    
     /**
-     * 
+     *
      * Alfresco storage number
-     * 
+     *
      */
     public static final int REP_TYPE_ALFRESCO = 1;
-    
     /**
-     * 
+     *
      * Nuxeo storage number
-     * 
+     *
      */
     public static final int REP_TYPE_NUXEO = 2;
-    
     /**
-     * 
+     *
      * Folder to browse
-     * 
+     *
      */
     public Folder browseFolder;
-    
     /**
-     * 
+     *
      * Translate Rules Folder
-     * 
+     *
      */
     public Folder translateRulesFolder;
 
     /**
-     * 
+     *
      * RepositoryHandler object for connecting to an Alfresco store
-     * 
+     *
      * @param repositoryURL Alfresco repository URL location
      * @param repositoryUsername Alfresco repository user name
      * @param repositoryPassword Alfresco repository password
@@ -136,15 +139,15 @@ public class RepositoryHandler {
 
         System.out.println("-- Connected to repository: "
                 + repository.getName() + ", with id: " + repository.getId());
-        
+
         //get workflow engines
-       // ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();    
+        // ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();    
     }
 
     /**
-     * 
+     *
      * Create empty file in repository
-     * 
+     *
      * @param filename The name of the file to be created
      */
     public void createEmptyFile(String filename) {
@@ -163,9 +166,9 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * Read file and return contents as a string
-     * 
+     *
      * @param filename The name of the file to read
      * @return
      */
@@ -202,40 +205,141 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
-     * 
-     * Send content to the CMS for processing by Globic component
-     * 
-     * @param fileDir The file directory for which you are sending the data 
-     * 
-     * 
-     * 
+     *
+     * @param fileDir -(This is for testing remove)
+     *
+     * @@param componentName Here you specify what name you want to call your
+     * component. Component name must be unique. It is not possible to have two
+     * or more components with the same name registered with the service.
+     *
+     * @param password Here you enter your password.
+     *
+     * @param activity Here you enter the activity that is being carried out by
+     * your component. An activity is limited to the list of content processing
+     * activities specified in the Globic semantic model. In order for the
+     * service to be able to recognise the activity, the name you give to the
+     * activity being carried out must contain the actual name of the activity
+     * as specified in the Globic model. For example, two content processing
+     * activities within the Globic model are TextAnalysis and Translate. Some
+     * Sample activity names that would work with the service would be :
+     * textanalysis_50, 5_My_TextAnalysis, translateActivity101 or
+     * my_translate_92. These work as the actual activity name appears within
+     * the name given. Some Sample activity names that would not work with the
+     * service would be: 5_My_Text_Analysis, AnalysisText_12 or trans_7.
+     *
+     * @param user Here you can specify if a user was involved in an activity
+     * along with a component. This is an optional token in the request as a
+     * user does not always have to be involved in an activity. The user can be
+     * the name of a person or a worker ID number etc. If specifying the user as
+     * the name of a person with a first and last name, do not use a space
+     * between the names, instead use humpback notation or use an underscore,
+     * for example: JoeBloggs or Joe_Bloggs.
+     *
+     * @param contentConsumed1 Here it is possible to specify up to 10 pieces of
+     * content that were consumed or used by an activity. This is an optional
+     * token in the request as not all activities consume content. Pieces of
+     * content consumed are specified by appending a number (1-10) at the end of
+     * the token, where the hash symbol is located. The Globic Log Service deals
+     * with content from a file oriented perspective, so what you specify is a
+     * URI of the files location.
+     *
+     * An example to specify two pieces of consumed content, document_1 and
+     * document_2 with a URI location of http://www.example.com/filestore/,
+     * would look as follows:
+     * &contentConsumed1=<http://www.example.com/filestore/document_1>&contentConsumed2=<http://www.example.com/filestore/docuemnt_2>
+     * .
+     *
+     * @param contentConsumed1Type Here it is possible to specify up to 10
+     * pieces of content that were consumed or used by an activity. This is an
+     * optional token in the request as not all activities consume content.
+     * Pieces of content consumed are specified by appending a number (1-10) at
+     * the end of the token, where the hash symbol is located. The Globic Log
+     * Service deals with content from a file oriented perspective, so what you
+     * specify is a URI of the files location.
+     *
+     * An example to specify two pieces of consumed content, document_1 and
+     * document_2 with a URI location of http://www.example.com/filestore/,
+     * would look as follows:
+     * &contentConsumed1=<http://www.example.com/filestore/document_1>&contentConsumed2=<http://www.example.com/filestore/docuemnt_2>
+     * .
+     *
+     * @param contentGenerated1 Here it is possible to specify up to 10 pieces
+     * of content that were generated by an activity. This is an optional token
+     * in the request as not all activities generate content. Pieces of content
+     * are specified by appending a number (1-10) at the end of the token, where
+     * the hash symbol is located. The Globic Log Service deals with content
+     * from a file oriented perspective, so what you specify is a URI of the
+     * files location.
+     *
+     * An example to specify two pieces of content that were generated,
+     * document_3 and document_4 with a URI location of
+     * http://www.example.com/filestore/, would look as follows:
+     * &contentGenerated1=<http://www.example.com/filestore/document_3>&contentGenerated2=<http://www.example.com/filestore/docuemnt_4>
+     * .
+     *
+     * @param contentGenerated1Type Here it is possible to specify the type of
+     * any of the generated content similar to how you can do it for any content
+     * consumed. The Globic semantic model contains the types of content that
+     * can be generated for each activity so when specifying a type for a piece
+     * of generated content, it must match that in the Globic model. This is an
+     * optional token in the request; it is used to make the generated
+     * provenance data more accurate. If it is not set then any consumed content
+     * is set to a default type. In order to specify a type for a piece of
+     * generated content, the number associated with a piece of generated
+     * content is placed in the token, where the hash symbol is located.
+     *
+     * For example, if you have already specified some generated content:
+     * &contentGenereated1=<http://www.example.com/filestore/document_3> . In
+     * order to declare that document_3 is of type gic:Translation, you would
+     * add the following to the request: &contentGenerated1Type=gic:Translation
+     *
      */
-    public void sendContentToCMS(String fileDir, String activity, String user, String password, String content, String contentType, String component) {
+    public String sendContentToCMS(String fileDir, String activity, String user, String password, String contentJobType, String contentType, String component,String partitionName) throws MalformedURLException, IOException {
         
+        Properties prop = new Properties();
+	InputStream inputConfig = null;
+ 
+        inputConfig = new FileInputStream(Constants.CONFIG_FILENAME);
+        
+        // load a properties file
+	prop.load(inputConfig);
+        
+        String pushReport ="";
         //check for tipp or zip
-        String filename="";
-        if(fileDir.contains("/")){
-        //linux filepath
-        filename=fileDir.substring(fileDir.lastIndexOf("/"), fileDir.length()).replace("/", ""); 
-        System.out.println(filename);
-        }else
-            if(fileDir.contains("\\")){
-               //windows filepath
-               filename=fileDir.substring(fileDir.lastIndexOf("\\"), fileDir.length()).replace("\\", ""); 
-               System.out.println(filename); 
-            }
+        String filename = "";
+        if (fileDir.contains("/")) {
+            //linux filepath
+            filename = fileDir.substring(fileDir.lastIndexOf("/"), fileDir.length()).replace("/", "");
+            System.out.println(filename);
+        } else if (fileDir.contains("\\")) {
+            //windows filepath
+            filename = fileDir.substring(fileDir.lastIndexOf("\\"), fileDir.length()).replace("\\", "");
+            System.out.println(filename);
+        }
         
-        RepositoryHandler handler = new RepositoryHandler(repositoryURL, repositoryUsername,
-                repositoryPasword, repositoryType);
+        
+        //RepositoryHandler handler = new RepositoryHandler(repositoryURL, repositoryUsername,
+          //      repositoryPasword, repositoryType);
 
         //upload to place holder folder
-        Folder root = session.getRootFolder();
-
+      //  Folder root = session.getRootFolder();
+        Path target = Paths.get(prop.getProperty("globicLocalFolder")+filename);
+        URL website = new URL(fileDir);
+        Files.copy(website.openStream(), target, StandardCopyOption.REPLACE_EXISTING);
+        
+        
+        //check if file is downloaded
+        File f = new File(prop.getProperty("globicLocalFolder")+filename);
+	  if(f.exists()){
+		  System.out.println("File existed");
+	  }else{
+                   return "File not downloaded";
+	  }
+        
         //read content from file
-        BufferedReader br = null;
-        String data = readFile(fileDir);
-
+        /*BufferedReader br = null;
+        String data = readFile(prop.getProperty("globicLocalFolder")+filename);
+      
         //create new file with properties else
         byte[] buf = null;
         try {
@@ -254,7 +358,7 @@ public class RepositoryHandler {
         folderProps.put("globic:user", user);
         folderProps.put("globic:password", password);
         folderProps.put("globic:activity", activity);
-        folderProps.put("globic:content", content);
+        folderProps.put("globic:content", contentJobType);
         folderProps.put("globic:contentType", contentType);
         folderProps.put("globic:processed", "no");
 
@@ -268,17 +372,17 @@ public class RepositoryHandler {
 
             System.out.println("File exists then just update the content in the file");
             System.out.println("Step 2: Update content in the file");
-            data = readFile(fileDir);
+            data = readFile(filename);
             CmisObject cmisFile = session.getObjectByPath("/" + filename);
 
-            byte[] buf2 = null;
+            byte[] fileContent = null;
             try {
-                buf2 = data.getBytes("UTF-8");
+                fileContent = data.getBytes("UTF-8");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
 
-            ByteArrayInputStream filestream = new ByteArrayInputStream(buf2);
+            ByteArrayInputStream filestream = new ByteArrayInputStream(fileContent);
 
             ContentStream filecontentStream = new ContentStreamImpl(filename, BigInteger.valueOf(data.length()), "text/xml", filestream);
             doc = (Document) cmisFile;
@@ -288,25 +392,31 @@ public class RepositoryHandler {
 
         System.out.println("Step 3: get spaceStore ID");
         String spaceStore = handler.getAlfrescoProperty(filename, "alfcmis:nodeRef");
-
-        String contentConsumed = "<http://kdeg-vm-13.scss.tcd.ie:8080/alfresco/d/d/workspace/" + spaceStore.replace("workspace://", "") + "/" + filename + ">";
-        System.out.println("spaceStore===" + contentConsumed);
+*/
+      //  String contentConsumed = "http://kdeg-vm-13.scss.tcd.ie:8080/alfresco/d/d/workspace/" + spaceStore.replace("workspace://", "") + "/" + filename;
+        String contentConsumed="http://kdeg-vm-13.scss.tcd.ie:8080/alfresco/d/d/workspace/" + "/" + filename;
+          System.out.println("spaceStore===" + contentConsumed);
 
         System.out.println("Step 4:Push content to globic using the REST API");
-        String pushReport = Globic.postGlobicContent(component, user, password, activity, contentConsumed, contentType,content);
+        pushReport = Globic.postGlobicContent(component, user, password, activity, contentConsumed, contentType, contentJobType,prop.getProperty("globicLocalFolder")+filename,partitionName);
         System.out.println(pushReport);
         if (!pushReport.contains("Error")) {
-            handler.setProperty(filename, user, password, activity, content, contentType, "yes");
+  //          handler.setProperty(filename, user, password, activity, contentJobType, contentType, "yes");
         }
+        
+        //deletefile
+        Files.delete(target);
+        
+        return pushReport;
     }
 
     /**
-     * 
-     * 
-     * 
-     * @param filename
-     * @param property
-     * @return
+     *
+     * Get Alfresco CMIS properties
+     *
+     * @param filename documents filename
+     * @param property the property of the document that you want
+     * @return the CMIS property
      */
     public String getAlfrescoProperty(String filename, String property) {
 
@@ -330,17 +440,19 @@ public class RepositoryHandler {
     }
 
     /**
+     * Get the Globic CMIS properties
+     *
+     * @param filename the file name of the document
      * 
-     * @param filename
-     * @return
+     * @return an ArrayList containing all the Globic CMIS property values
      */
     public ArrayList<String> getGlobicProperties(String filename) {
 
         ArrayList<String> globicProperties = new ArrayList<String>();
 
-        Document doc = (Document) session.getObjectByPath("/"+filename);
+        Document doc = (Document) session.getObjectByPath("/" + filename);
         List<Property<?>> properties = doc.getProperties();
-        //String propertyValue = "";
+        
         for (Property<?> p : properties) {
             if (p.getFirstValue() == null) {
                 if (p.getId().contains("globic")) {
@@ -354,19 +466,21 @@ public class RepositoryHandler {
         }
         return globicProperties;
     }
-    
+
     /**
+     *
+     * Get all CMIS properties
      * 
-     * @param filename
-     * @return
+     * @param filename the file name of the document
+     * 
+     * @returnan ArrayList containing all the CMIS property values
      */
     public ArrayList<String> getAllProperties(String filename) {
 
         ArrayList<String> globicProperties = new ArrayList<String>();
 
-        Document doc = (Document) session.getObjectByPath("/"+filename);
+        Document doc = (Document) session.getObjectByPath("/" + filename);
         List<Property<?>> properties = doc.getProperties();
-        //String propertyValue = "";
         for (Property<?> p : properties) {
             if (p.getFirstValue() == null) {
                 if (p.getId().contains("globic")) {
@@ -382,7 +496,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param filename
      */
     public void viewExampleOProperties(String filename) {
@@ -404,14 +518,16 @@ public class RepositoryHandler {
     }
 
     /**
+     *
+     * Set the CMIS Globic properties
      * 
-     * @param filename
-     * @param user
-     * @param password
-     * @param activity
-     * @param content
-     * @param contentType
-     * @param processed
+     * @param filename file name
+     * @param user Globic username
+     * @param password Globic password 
+     * @param activity Globic activity
+     * @param content the Globic content
+     * @param contentType the Globic content type
+     * @param processed Globic was it processed sucessfully or not
      */
     public void setProperty(String filename, String user, String password, String activity, String content, String contentType, String processed) {
 
@@ -431,60 +547,8 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
-     * @param componentName
-     * @param filename
-     * @return
-     */
-    public Document createDocument(String componentName, String filename) {
-
-        //need to add in selecting correct folder
-        Folder folder = session.getRootFolder();
-
-        // Create a simple text document in the new folder
-        // First, create the content stream
-        System.out.println("creating a simple text document, " + filename);
-        String mimetype = "text/plain; charset=UTF-8";
-        String content = "This is some test content.";
-        //String targetFilename = textFileName;
-        byte[] buf = null;
-        try {
-            buf = content.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        ByteArrayInputStream input = new ByteArrayInputStream(buf);
-        ContentStream contentStream = session.getObjectFactory()
-                .createContentStream(filename, buf.length, mimetype, input);
-
-        // Create the Document Object
-        Map<String, Object> properties = new HashMap<String, Object>();
-
-        //if (repositoryType == REP_TYPE_NUXEO) {
-        //	properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document,File");
-        //} else
-        //    if (repositoryType == REP_TYPE_ALFRESCO) {
-        properties.put(PropertyIds.OBJECT_TYPE_ID,
-                "cmis:document,P:loc:readiness");
-        //}
-
-        GregorianCalendar publishDate = new GregorianCalendar(2007, 4, 1, 5, 0);
-        properties.put("loc:readytoprocess", "ready");
-        properties.put("loc:processref", "some-ref");
-        properties.put("loc:readyat", publishDate);
-        properties.put("loc:revised", false);
-        properties.put("loc:priority", "high");
-        properties.put("loc:completeby", publishDate);
-        properties.put("loc:notified", false);
-        properties.put(PropertyIds.NAME, "test2");
-
-        Document doc = folder.createDocument(properties, contentStream, VersioningState.MAJOR);
-        doc.updateProperties(properties, true);
-
-        return doc;
-    }
-
-    /**
+     *
+     * Get the Alfresco root folder
      * 
      */
     public void browserGetRoot() {
@@ -492,15 +556,17 @@ public class RepositoryHandler {
     }
 
     /**
+     *
+     * Get the Alfresco path
      * 
-     * @return
+     * @return the Alfresco path
      */
     public String browserGetPath() {
         return browseFolder.getPath();
     }
 
     /**
-     * 
+     *
      * @return
      */
     public String browserFolderToString() {
@@ -516,7 +582,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param subFolder
      */
     public void browserChangePath(String subFolder) {
@@ -528,8 +594,7 @@ public class RepositoryHandler {
             } else if (parents.size() > 1) {
                 int selection = -1;
                 while ((selection < 0) || (selection >= parents.size())) {
-                    System.out
-                            .print("Folder has multiple parents. Please select which one: ");
+                    System.out.print("Folder has multiple parents. Please select which one: ");
                     int i = 0;
                     for (Folder f : parents) {
                         System.out.println(i + "\t" + f.getPath() + "/"
@@ -562,7 +627,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static int readInt() {
@@ -582,7 +647,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param objectName
      */
     public void browserDeleteObject(String objectName) {
@@ -605,7 +670,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param objectName
      * @param objectPath
      */
@@ -623,7 +688,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param objectName
      */
     public void rulesDelete(String objectName) {
@@ -647,7 +712,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param folderName
      */
     public void browserMakeFolder(String folderName) {
@@ -663,7 +728,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param fileName
      */
     public void browserMakeFile(String fileName) {
@@ -681,7 +746,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param fileName
      */
     public void browserMakeSampleFile(String fileName) {
@@ -716,28 +781,6 @@ public class RepositoryHandler {
         }
     }
 
-    /**
-     * 
-     * @param fileName
-     */
-    public void browserMakeSampleFile2(String fileName) {
-        Map<String, Object> properties = getDefaultFileProperties();
-        properties.put(PropertyIds.NAME, fileName);
-        properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
-        try {
-            String docText = "This is a sample document";
-            byte[] content = docText.getBytes();
-            InputStream stream = new ByteArrayInputStream(content);
-            ContentStream contentStream = session.getObjectFactory().createContentStream(fileName, Long.valueOf(content.length), "text/plain", stream);
-
-            Document doc = browseFolder.createDocument(properties, contentStream, VersioningState.MAJOR);
-            //doc.updateProperties(properties, true);
-        } catch (CmisContentAlreadyExistsException e) {
-            System.out.println("Could not create file '" + fileName + "': "
-                    + e.getMessage());
-        }
-    }
-
     private Map<String, Object> getDefaultFileProperties() {
         Map<String, Object> properties = new HashMap<String, Object>();
         if (repositoryType == REP_TYPE_ALFRESCO) {
@@ -762,7 +805,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param fileName
      */
     public void browserShowFile(String fileName) {
@@ -795,7 +838,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param fileName
      */
     public void browserSetFile(String fileName) {
@@ -817,8 +860,7 @@ public class RepositoryHandler {
             e.printStackTrace();
         }
         ByteArrayInputStream input = new ByteArrayInputStream(buf);
-        ContentStream contentStream = session.getObjectFactory()
-                .createContentStream(filename, buf.length, mimetype, input);
+        ContentStream contentStream = session.getObjectFactory().createContentStream(filename, buf.length, mimetype, input);
 
         if (browseFolder.isRootFolder()) {
             objectPath = browseFolder.getPath() + fileName;
@@ -835,7 +877,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static String readString() {
@@ -853,7 +895,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param content
      * @return
      */
@@ -872,7 +914,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static boolean readBoolean() {
@@ -894,7 +936,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public static GregorianCalendar readGregorian() {
@@ -936,7 +978,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param objectName
      * @param targetPath
      */
@@ -968,7 +1010,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param objectName
      * @param targetPath
      */
@@ -1002,7 +1044,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param objectName
      * @param pollingScheme
      */
@@ -1025,12 +1067,10 @@ public class RepositoryHandler {
                     doc.addToFolder(target, true);
                 } else if (repositoryType == REP_TYPE_NUXEO) {
                     List<Object> newPollingSchemes;
-                    Property<Object> pollingSchemes = doc
-                            .getProperty("loc:pollingschemes");
+                    Property<Object> pollingSchemes = doc.getProperty("loc:pollingschemes");
                     Map<String, Object> newProps = new HashMap<String, Object>();
                     if (pollingSchemes.isMultiValued()) {
-                        newPollingSchemes = (List<Object>) pollingSchemes
-                                .getValues();
+                        newPollingSchemes = (List<Object>) pollingSchemes.getValues();
                         if (!(newPollingSchemes.contains(target.getPath()))) {
                             newPollingSchemes.add(target.getPath());
                         }
@@ -1056,7 +1096,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param queryString1
      * @param queryString2
      * @return
@@ -1071,8 +1111,7 @@ public class RepositoryHandler {
         results.retainAll(results2);
 
         for (String objectId : results) {
-            CmisObject obj = session
-                    .getObject(session.createObjectId(objectId));
+            CmisObject obj = session.getObject(session.createObjectId(objectId));
             objList.add(obj);
         }
 
@@ -1080,7 +1119,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param queryString1
      * @param queryString2
      * @return
@@ -1095,15 +1134,14 @@ public class RepositoryHandler {
         results.removeAll(results2);
 
         for (String objectId : results) {
-            CmisObject obj = session
-                    .getObject(session.createObjectId(objectId));
+            CmisObject obj = session.getObject(session.createObjectId(objectId));
             objList.add(obj);
         }
         return objList;
     }
 
     /**
-     * 
+     *
      * @param queryString1
      * @return
      */
@@ -1114,15 +1152,14 @@ public class RepositoryHandler {
         Set<String> results = new HashSet<String>(results1);
 
         for (String objectId : results) {
-            CmisObject obj = session
-                    .getObject(session.createObjectId(objectId));
+            CmisObject obj = session.getObject(session.createObjectId(objectId));
             objList.add(obj);
         }
         return objList;
     }
 
     /**
-     * 
+     *
      * @param queryString1
      * @param queryString2
      * @return
@@ -1142,8 +1179,7 @@ public class RepositoryHandler {
             if (propData != null) {
                 objectId = (String) propData.getFirstValue();
             } else {
-                objectId = qResult
-                        .getPropertyValueByQueryName("d.cmis:objectId"); // Web
+                objectId = qResult.getPropertyValueByQueryName("d.cmis:objectId"); // Web
                 // Services
                 // Binding
             }
@@ -1160,7 +1196,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param objectIdList
      * @return
      */
@@ -1180,7 +1216,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param queryString
      * @return
      */
@@ -1198,13 +1234,11 @@ public class RepositoryHandler {
             if (propData != null) {
                 objectId = (String) propData.getFirstValue();
             } else {
-                objectId = qResult
-                        .getPropertyValueByQueryName("d.cmis:objectId"); // Web
+                objectId = qResult.getPropertyValueByQueryName("d.cmis:objectId"); // Web
                 // Services
                 // binding
             }
-            CmisObject obj = session
-                    .getObject(session.createObjectId(objectId));
+            CmisObject obj = session.getObject(session.createObjectId(objectId));
             objList.add(obj);
         }
 
@@ -1212,7 +1246,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param queryString
      * @return
      */
@@ -1230,8 +1264,7 @@ public class RepositoryHandler {
             if (propData != null) {
                 objectId = (String) propData.getFirstValue();
             } else {
-                objectId = qResult
-                        .getPropertyValueByQueryName("d.cmis:objectId"); // Web
+                objectId = qResult.getPropertyValueByQueryName("d.cmis:objectId"); // Web
                 // Services
                 // binding
             }
@@ -1242,18 +1275,15 @@ public class RepositoryHandler {
         return objList;
     }
 
-
     /**
-     * 
+     *
      */
     public void listTranslateRules() {
 
         try {
-            translateRulesFolder = (Folder) session
-                    .getObjectByPath("/TranslateRules");
+            translateRulesFolder = (Folder) session.getObjectByPath("/TranslateRules");
         } catch (CmisObjectNotFoundException e) {
-            System.out
-                    .println("translateRules folder not found, creating one.");
+            System.out.println("translateRules folder not found, creating one.");
             Map<String, String> properties = new HashMap<String, String>();
             properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
             properties.put(PropertyIds.NAME, "TranslateRules");
@@ -1291,14 +1321,13 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param ruleName
      * @param ruleString
      */
     public void rulesNew(String ruleName, String ruleString) {
         try {
-            translateRulesFolder = (Folder) session
-                    .getObjectByPath("/TranslateRules");
+            translateRulesFolder = (Folder) session.getObjectByPath("/TranslateRules");
             Map<String, String> properties = new HashMap<String, String>();
             properties.put(PropertyIds.OBJECT_TYPE_ID,
                     "cmis:folder,P:trans:translateRule");
@@ -1323,7 +1352,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param fileName
      */
     public void rulesAdd(String fileName) {
@@ -1336,7 +1365,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param fileName
      */
     public void rulesView(String fileName) {
@@ -1373,7 +1402,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param schemeName
      * @param interval
      * @param notificationMethod
@@ -1390,8 +1419,7 @@ public class RepositoryHandler {
         try {
 
             try {
-                pollingSchemeFolder = (Folder) session
-                        .getObjectByPath("/PollingSchemes");
+                pollingSchemeFolder = (Folder) session.getObjectByPath("/PollingSchemes");
             } catch (CmisObjectNotFoundException e) {
                 System.out.println("PollingSchemes folder not found: "
                         + e.getMessage());
@@ -1399,8 +1427,7 @@ public class RepositoryHandler {
                 properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:folder");
                 properties.put(PropertyIds.NAME, "PollingSchemes");
                 session.getRootFolder().createFolder(properties);
-                pollingSchemeFolder = (Folder) session
-                        .getObjectByPath("/PollingSchemes");
+                pollingSchemeFolder = (Folder) session.getObjectByPath("/PollingSchemes");
             }
             Map<String, Object> properties = new HashMap<String, Object>();
             if (repositoryType == REP_TYPE_ALFRESCO) {
@@ -1435,7 +1462,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param objectName
      */
     public void deletePollingScheme(String objectName) {
@@ -1459,7 +1486,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param path
      */
     public void deleteObjectRecursively(String path) {
@@ -1472,7 +1499,7 @@ public class RepositoryHandler {
     }
 
     /**
-     * 
+     *
      * @param object
      */
     public void deleteObjectRecursively(CmisObject object) {
@@ -1500,76 +1527,80 @@ public class RepositoryHandler {
         } catch (java.lang.NullPointerException e) {
         }
     }
-    
+
     /**
-     * 
+     *
      * @param query
      * @return
      */
-    public String queryCMS (String query){
-        String result="";
+    public String queryCMS(String query) {
+        String result = "";
         System.out.println("\nQuery...");
         System.out.println("--------");
-        
-            // Query 
-            ItemIterable<QueryResult> q = session.query(query, false);
-            System.out.println("***results from query " + query);
 
-          int i = 1;
-            for (QueryResult qr : q) {
-                System.out.println("--------------------------------------------\n" + i + " , "
-                        + qr.getPropertyByQueryName("cmis:objectTypeId").getFirstValue() + " , "
-                        + qr.getPropertyByQueryName("cmis:name").getFirstValue() + " , "
-                        + qr.getPropertyByQueryName("cmis:createdBy").getFirstValue() + " , "
-                        + qr.getPropertyByQueryName("cmis:objectId").getFirstValue() + " , "
-                        + qr.getPropertyByQueryName("cmis:contentStreamFileName").getFirstValue()
-                        + " , "
-                        + qr.getPropertyByQueryName("cmis:contentStreamMimeType").getFirstValue()
-                        + " , "
-                        + qr.getPropertyByQueryName("cmis:contentStreamLength").getFirstValue());
-                System.out.println(qr.getProperties().toString());
-                result=qr.getPropertyByQueryName("cmis:objectId").getFirstValue().toString();
-                
-                i++;
-            }
+        // Query 
+        ItemIterable<QueryResult> q = session.query(query, false);
+        System.out.println("***results from query " + query);
+
+        int i = 1;
+        for (QueryResult qr : q) {
+            System.out.println("--------------------------------------------\n" + i + " , "
+                    + qr.getPropertyByQueryName("cmis:objectTypeId").getFirstValue() + " , "
+                    + qr.getPropertyByQueryName("cmis:name").getFirstValue() + " , "
+                    + qr.getPropertyByQueryName("cmis:createdBy").getFirstValue() + " , "
+                    + qr.getPropertyByQueryName("cmis:objectId").getFirstValue() + " , "
+                    + qr.getPropertyByQueryName("cmis:contentStreamFileName").getFirstValue()
+                    + " , "
+                    + qr.getPropertyByQueryName("cmis:contentStreamMimeType").getFirstValue()
+                    + " , "
+                    + qr.getPropertyByQueryName("cmis:contentStreamLength").getFirstValue());
+            System.out.println(qr.getProperties().toString());
+            result = qr.getPropertyByQueryName("cmis:objectId").getFirstValue().toString();
+
+            i++;
+        }
         return result;
     }
-    
+
     //
     /**
-     * 
+     *
      * @param folderName
      * @return
      */
-    public Map<Integer, List<String>> getFolderContentsInfo (String folderName){
+    public Map<Integer, List<String>> getFolderContentsInfo(String folderName) {
         Map<Integer, List<String>> map = new HashMap<Integer, List<String>>();
-        
+
         ArrayList<String> result = new ArrayList<String>();
         //Folder root = session.getRootFolder();
         Folder root = null;
-        if(!folderName.equalsIgnoreCase("Company Home")){
-        try{    
-        root=(Folder) session.getObjectByPath("/" + folderName);
-        }catch(Exception ex){
-            
+        if (!folderName.equalsIgnoreCase("Company Home")) {
+            try {
+                root = (Folder) session.getObjectByPath("/" + folderName);
+            } catch (Exception ex) {
+            }
+        } else {
+            root = (Folder) session.getObjectByPath("/" + "");
         }
-        }else{
-            root=(Folder) session.getObjectByPath("/" + "");
-        }
-            
-        if(root!=null){
-        ItemIterable<CmisObject> children = root.getChildren();
-        int i=0;
-        for(CmisObject o:children){
-            List<String> valList = new ArrayList<String>();
-            valList.add(o.getName());
-            valList.add(o.getId());
-            valList.add(o.toString());
-            map.put(i,valList );
-            i++;
-        }
+
+        if (root != null) {
+            ItemIterable<CmisObject> children = root.getChildren();
+            int i = 0;
+            for (CmisObject o : children) {
+                List<String> valList = new ArrayList<String>();
+                valList.add(o.getName());
+                valList.add(o.getId());
+                valList.add(o.toString());
+                map.put(i, valList);
+                i++;
+            }
         }
         return map;
+    }
+    
+    public static void main(String args[]) throws MalformedURLException, IOException{
+        String data=RepositoryHandler.readFile("");
+        System.out.println(data);
     }
     
 }

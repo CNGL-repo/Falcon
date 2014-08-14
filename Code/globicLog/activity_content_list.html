@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Globic Log Service - Content Processing Activities & Allowed Content </title>
+ </head>
+ <body>
+
+ <h1 style="color:#1E90FF">Globic Log Service - Content Processing Activities List and Allowed Content</h1>
+ 
+ <p>The following is a list of the content processing activities as stated in the 
+    <a href="http://www.cngl.ie/ontologies/gic#">Globic semantic model</a>. Also included in the list
+	are the types of content that the activities can consume and generate.<br />
+    Note that the Globic model will change over time and this list may become outdated.<br /><br />
+    This list is accurate as of 11/09/2013.</p>
+	
+	<p>
+	<ol>
+	  <!-- TextAnalysis -->
+	  <li><b>TextAnalysis</b></li>
+	  <ul>
+	    <li>Allowable consumed content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>nif:String</li>
+		  <li>nif:Structure</li>
+		  <li>nif:Word</li>
+		  <li>nif:Phrase</li>
+		  <li>nif:Sentence</li>
+		</ul>
+		<li>Allowable generated content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>nif:String</li>
+		  <li>nif:Word</li>
+		  <li>nif:Phrase</li>
+		  <li>sso:Phrase</li>
+		  <li>sso:Word</li>
+		</ul>
+	  </ul>
+	  <hr />
+	  <!-- Extraction -->
+	  <li><b>Extraction</b></li>
+	  <ul>
+	    <li>Allowable consumed content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		</ul>
+		<li>Allowable generated content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:SourceUnit</li>
+		</ul>
+	  </ul>
+	  <hr />
+	  <!-- Segmentation -->
+	  <li><b>Segmentation</b></li>
+	  <ul>
+	    <li>Allowable consumed content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:SourceUnit</li>
+		</ul>
+		<li>Allowable generated content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:Segment</li>
+		</ul>
+	  </ul>
+	  <hr />
+	   <!-- TerminologyIdentification -->
+	  <li><b>TerminologyIdentification</b></li>
+	  <ul>
+	    <li>Allowable consumed content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>nif:String</li>
+		  <li>nif:Structure</li>
+		  <li>nif:Word</li>
+		  <li>nif:Phrase</li>
+		  <li>nif:Sentence</li>
+		  <li>sso:Phrase</li>
+		  <li>sso:Word</li>
+		</ul>
+		<li>Allowable generated content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:Term</li>
+		</ul>
+	  </ul>
+	  <hr />
+	   <!-- Translate -->
+	  <li><b>Translate</b></li>
+	  <ul>
+	    <li>Allowable consumed content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:SourceUnit</li>
+		  <li>gic:Segment</li>
+		  <li>gic:Term</li>
+		  <li>nif:String</li>
+		  <li>nif:Structure</li>
+		  <li>nif:Word</li>
+		  <li>nif:Phrase</li>
+		  <li>nif:Sentence</li>
+		  <li>sso:Phrase</li>
+		  <li>sso:Word</li>
+		</ul>
+		<li>Allowable generated content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:Translation</li>
+		</ul>
+	  </ul>
+	  <hr />
+	   <!-- ReviseTranslation -->
+	  <li><b>ReviseTranslation</b></li>
+	  <ul>
+	    <li>Allowable consumed content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:SourceUnit</li>
+		  <li>gic:Segment</li>
+		  <li>gic:Term</li>
+		  <li>nif:String</li>
+		  <li>nif:Structure</li>
+		  <li>nif:Word</li>
+		  <li>nif:Phrase</li>
+		  <li>sso:Phrase</li>
+		  <li>sso:Word</li>
+		  <li>gic:Translation</li>
+		  <li>gic:TranslationRevision</li>
+		</ul>
+		<li>Allowable generated content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:TranslationRevision</li>
+		</ul>
+	  </ul>
+	  <hr />
+	   <!-- QualityReview -->
+	  <li><b>QualityReview</b></li>
+	  <ul>
+	    <li>Allowable consumed content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:SourceUnit</li>
+		  <li>gic:Segment</li>
+		  <li>gic:Term</li>
+		  <li>nif:String</li>
+		  <li>nif:Structure</li>
+		  <li>nif:Word</li>
+		  <li>nif:Phrase</li>
+		  <li>sso:Phrase</li>
+		  <li>sso:Word</li>
+		  <li>gic:Translation</li>
+		  <li>gic:TranslationRevision</li>
+		</ul>
+		<li>Allowable generated content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:QualityAssessment</li>
+		</ul>
+	  </ul>
+	  <hr />
+	   <!-- InteractionManagement -->
+	  <li><b>InteractionManagement</b></li>
+	  <ul>
+	    <li>Allowable consumed content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:DialogueScript</li>
+		  <li>gic:Interpretation</li>
+		</ul>
+		<li>Allowable generated content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:OutSignal</li>
+		</ul>
+	  </ul>
+	  <hr />
+	   <!-- InputInterpretation -->
+	  <li><b>InputInterpretation</b></li>
+	  <ul>
+	    <li>Allowable consumed content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:InSignal</li>
+		</ul>
+		<li>Allowable generated content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:Interpretation</li>
+		</ul>
+	  </ul>
+	  <hr />
+	   <!-- UserProfiling -->
+	  <li><b>UserProfiling</b></li>
+	  <ul>
+		<li>Allowable generated content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:UserModel</li>
+		</ul>
+	  </ul>
+	  <hr />
+	   <!-- ContentSlicing -->
+	  <li><b>ContentSlicing</b></li>
+	  <ul>
+		<li>Allowable consumed content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		</ul>
+		<li>Allowable generated content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:Slice</li>
+		</ul>
+	  </ul>
+	  <hr />
+	   <!-- Personalisation -->
+	  <li><b>Personalisation</b></li>
+	  <ul>
+		<li>Allowable consumed content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:UserModel</li>
+		</ul>
+	  </ul>
+	  <hr />
+	   <!-- PersonalisedSearch -->
+	  <li><b>PersonalisedSearch</b></li>
+	  <ul>
+		<li>Allowable consumed content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:Query</li>
+		</ul>
+	  </ul>
+	  <hr />
+	   <!-- PersonalisedComposition -->
+	  <li><b>PersonalisedComposition</b></li>
+	  <ul>
+		<li>Allowable consumed content types:</li>
+		<ul>
+		  <li>gic:Content</li>
+		  <li>gic:Narrative</li>
+		  <li>gic:Slice</li>
+		</ul>
+	  </ul>
+	</ol>
+	</p>
+	
+ <div id="footer" style="clear:both;text-align:center;">Alan Meehan - 12/09/2013</div>
+ 
+ </body>
+</html>
